@@ -29,12 +29,13 @@ class BurgerBuilder extends Component {
     }
   }
 
-  componentDidMount() {
-    getIngredients()
-      .then(({ data }) => {
-        this.setState({ ingredients: data })
-      })
-      .catch((err) => this.setState({ error: true }))
+  async componentDidMount() {
+    try {
+      const { data } = await getIngredients()
+      this.setState({ ingredients: data })
+    } catch (error) {
+      this.setState({ error: true })
+    }
   }
 
   addIngredientHandler = (type) => {
