@@ -1,14 +1,25 @@
-import React, { Component } from 'react'
+import React, { Component, Suspense } from 'react'
+import { Route, Switch } from 'react-router-dom'
 import './index.css'
 import Layout from './containers/Layout/Layout'
-import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder'
+import Spinner from './components/UI/Spinner/Spinner'
+
+const BurgerBuilder = React.lazy(() =>
+  import('./containers/BurgerBuilder/BurgerBuilder')
+)
+const Checkout = React.lazy(() => import('./containers/Checkout/Checkout'))
 
 class App extends Component {
   render() {
     return (
       <div>
         <Layout>
-          <BurgerBuilder />
+          <Suspense fallback={<Spinner />}>
+            <Switch>
+              <Route path="/" exact component={BurgerBuilder} />
+              <Route path="/checkout" component={Checkout} />
+            </Switch>
+          </Suspense>
         </Layout>
       </div>
     )
