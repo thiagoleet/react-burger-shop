@@ -4,7 +4,7 @@ import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal'
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
-import { createOrder, getIngredients } from '../../services'
+import service from '../../services'
 import axios from '../../axios-orders'
 import Spinner from '../../components/UI/Spinner/Spinner'
 import withErrorHandler from '../../hoc/withErrorHandler'
@@ -31,7 +31,7 @@ class BurgerBuilder extends Component {
 
   async componentDidMount() {
     try {
-      const { data } = await getIngredients()
+      const { data } = await service.getIngredients()
       this.setState({ ingredients: data })
     } catch (error) {
       this.setState({ error: true })
@@ -91,33 +91,45 @@ class BurgerBuilder extends Component {
 
   purchaseContinueHandler = () => {
     this.setState({ loading: true })
-
-    const order = {
-      ingredients: this.state.ingredients,
-      price: this.state.totalPrice,
-      customer: {
-        name: 'Max',
-        address: {
-          street: 'Test Street 1',
-          zipCode: '41351',
-          country: 'Germany',
-        },
-        email: 'teste@test.com',
-      },
-      deliveryMethod: 'fastest',
+    const queryParams = new URLSearchParams()
+    for (const key in this.state.ingredients) {
+      if (this.state.ingredients.hasOwnProperty(key)) {
+        const element = this.state.ingredients[key]
+        queryParams.append(key, element)
+      }
     }
 
-    createOrder(order)
-      .then((response) => {
-        console.log(response)
-        this.setState({ purchasing: false })
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        this.setState({ loading: false })
-      })
+    this.props.history.push({
+      pathname: '/checkout',
+      search: queryParams.toString(),
+    })
+
+    // const order = {
+    //   ingredients: this.state.ingredients,
+    //   price: this.state.totalPrice,
+    //   customer: {
+    //     name: 'Max',
+    //     address: {
+    //       street: 'Test Street 1',
+    //       zipCode: '41351',
+    //       country: 'Germany',
+    //     },
+    //     email: 'teste@test.com',
+    //   },
+    //   deliveryMethod: 'fastest',
+    // }
+
+    // createOrder(order)
+    //   .then((response) => {
+    //     console.log(response)
+    //     this.setState({ purchasing: false })
+    //   })
+    //   .catch((err) => {
+    //     console.log(err)
+    //   })
+    //   .finally(() => {
+    //     this.setState({ loading: false })
+    //   })
   }
 
   render() {
