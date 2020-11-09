@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
 import Button from '../../../components/UI/Button/Button'
 import Spinner from '../../../components/UI/Spinner/Spinner'
 import classes from './ContactData.css'
@@ -95,4 +94,4 @@ class ContactData extends Component {
   }
 }
 
-export default withRouter(ContactData)
+export default ContactData
