@@ -40,7 +40,7 @@ class ContactData extends Component {
       orderForm: {
         deliveryMethod: new FormElement(
           'deliveryMethod',
-          '',
+          'fastest',
           '',
           'select',
           'Delivery Method',
@@ -65,10 +65,16 @@ class ContactData extends Component {
 
   orderHandler = (event) => {
     event.preventDefault()
-
+    const formData = {}
+    for (let formElementIdentifier in this.state.orderForm) {
+      formData[formElementIdentifier] = this.state.orderForm[
+        formElementIdentifier
+      ].value
+    }
     const order = {
       ingredients: this.props.ingredients,
       price: this.props.totalPrice,
+      orderData: formData,
     }
 
     service
@@ -85,6 +91,14 @@ class ContactData extends Component {
       })
   }
 
+  inputChangedHandler = (event, formElementKey) => {
+    const updatedOrderForm = { ...this.state.orderForm }
+    const updatedFormElement = { ...updatedOrderForm[formElementKey] }
+    updatedFormElement.value = event.target.value
+    updatedOrderForm[formElementKey] = updatedFormElement
+    this.setState({ orderForm: updatedOrderForm })
+  }
+
   render() {
     const formElements = []
     for (let key in this.state.orderForm) {
@@ -95,19 +109,18 @@ class ContactData extends Component {
     }
 
     let form = (
-      <form>
+      <form onSubmit={this.orderHandler}>
         {formElements.map((formElement) => (
           <Input
             key={formElement.id}
             elementType={formElement.config.elementType}
             elementConfig={formElement.config.elementConfig}
             value={formElement.config.value}
+            changed={(event) => this.inputChangedHandler(event, formElement.id)}
           />
         ))}
 
-        <Button btnType="Success" clicked={this.orderHandler}>
-          ORDER
-        </Button>
+        <Button btnType="Success">ORDER</Button>
       </form>
     )
     if (this.state.loading) {
