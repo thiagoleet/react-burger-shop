@@ -7,22 +7,40 @@ import service from '../../../services'
 import { elementType } from 'prop-types'
 
 class FormElement {
-  constructor(
-    name = '',
-    value = '',
-    type = 'text',
-    elementType = 'input',
-    placeholder = '',
-    options = null
-  ) {
-    this.elementType = elementType
-    this.value = value
+  constructor() {
+    this.elementType = 'input'
+    this.value = undefined
     this.elementConfig = {
-      type,
-      placeholder,
-      name,
-      options,
+      type: 'text',
+      placeholder: undefined,
+      name: undefined,
+      options: [],
     }
+  }
+}
+
+class FormElementBuilder {
+  constructor() {
+    this.formElement = new FormElement()
+  }
+
+  setElementType(elementType) {
+    this.formElement.elementType = elementType
+    return this
+  }
+
+  addValue(value) {
+    this.formElement.value = value
+    return this
+  }
+
+  addConfig({ type, placeholder, name, options }) {
+    this.formElement.elementConfig = { type, placeholder, name, options }
+    return this
+  }
+
+  build() {
+    return this.formElement
   }
 }
 
@@ -38,27 +56,54 @@ class ContactData extends Component {
       },
       loading: false,
       orderForm: {
-        deliveryMethod: new FormElement(
-          'deliveryMethod',
-          'fastest',
-          '',
-          'select',
-          'Delivery Method',
-          [
-            { value: 'fastest', displayValue: 'Fastest' },
-            { value: 'cheapest', displayValue: 'Cheapest' },
-          ]
-        ),
-        email: new FormElement('email', '', 'email', 'input', 'Your E-mail'),
-        name: new FormElement('name', '', 'text', 'input', 'Your Name'),
-        street: new FormElement('street', '', 'text', 'input', 'Street'),
-        zipCode: new FormElement(
-          'postal',
-          '',
-          'number',
-          'input',
-          'Postal Code'
-        ),
+        deliveryMethod: new FormElementBuilder()
+          .setElementType('select')
+          .addValue('fastest')
+          .addConfig({
+            name: 'deliveryMethod',
+            options: [
+              { value: 'fastest', displayValue: 'Fastest' },
+              { value: 'cheapest', displayValue: 'Cheapest' },
+            ],
+          })
+          .build(),
+
+        email: new FormElementBuilder()
+          .setElementType('input')
+          .addConfig({
+            type: 'email',
+            name: 'email',
+            placeholder: 'Your E-mail',
+          })
+          .build(),
+
+        name: new FormElementBuilder()
+          .setElementType('input')
+          .addConfig({
+            name: 'name',
+            type: 'text',
+            placeholder: 'Your Name',
+          })
+          .build(),
+
+        street: new FormElementBuilder()
+          .setElementType('input')
+          .addConfig({
+            name: 'street',
+            type: 'text',
+            placeholder: 'Street',
+          })
+          .build(),
+        zipCode: new FormElementBuilder()
+          .setElementType('input')
+          .addConfig({
+            name: 'postal',
+
+            type: 'number',
+
+            placeholder: 'Postal Code',
+          })
+          .build(),
       },
     }
   }
