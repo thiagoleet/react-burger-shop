@@ -9,13 +9,16 @@ import { elementType } from 'prop-types'
 class FormElement {
   constructor() {
     this.elementType = 'input'
-    this.value = undefined
+    this.value = ''
     this.elementConfig = {
       type: 'text',
       placeholder: undefined,
       name: undefined,
       options: [],
     }
+    this.validation = null
+    this.valid = false
+    this.touched = false
   }
 }
 
@@ -36,6 +39,11 @@ class FormElementBuilder {
 
   addConfig({ type, placeholder, name, options }) {
     this.formElement.elementConfig = { type, placeholder, name, options }
+    return this
+  }
+
+  addValidation(validation) {
+    this.formElement.validation = validation
     return this
   }
 
@@ -75,6 +83,7 @@ class ContactData extends Component {
             name: 'email',
             placeholder: 'Your E-mail',
           })
+          .addValidation({ required: true })
           .build(),
 
         name: new FormElementBuilder()
@@ -84,6 +93,7 @@ class ContactData extends Component {
             type: 'text',
             placeholder: 'Your Name',
           })
+          .addValidation({ required: true })
           .build(),
 
         street: new FormElementBuilder()
@@ -93,18 +103,19 @@ class ContactData extends Component {
             type: 'text',
             placeholder: 'Street',
           })
+          .addValidation({ required: true })
           .build(),
         zipCode: new FormElementBuilder()
           .setElementType('input')
           .addConfig({
             name: 'postal',
-
             type: 'number',
-
             placeholder: 'Postal Code',
           })
+          .addValidation({ required: true, minLength: 5, maxLength: 5 })
           .build(),
       },
+      formIsValid: false,
     }
   }
 
@@ -140,8 +151,33 @@ class ContactData extends Component {
     const updatedOrderForm = { ...this.state.orderForm }
     const updatedFormElement = { ...updatedOrderForm[formElementKey] }
     updatedFormElement.value = event.target.value
+    updatedFormElement.valid = this.checkValidity(
+      event.target.value,
+      updatedFormElement.validation
+    )
+    updatedFormElement.touched = true
     updatedOrderForm[formElementKey] = updatedFormElement
-    this.setState({ orderForm: updatedOrderForm })
+
+    let formIsValid = true
+    for (let inputIdentifier in updatedOrderForm) {
+      formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid
+    }
+
+    this.setState({ orderForm: updatedOrderForm, formIsValid: formIsValid })
+  }
+
+  checkValidity(value, rules) {
+    let isValid = true
+    if (rules && rules.required) {
+      isValid = value.trim() !== '' && isValid
+    }
+    if (rules && rules.minLength) {
+      isValid = value.length >= rules.minLength && isValid
+    }
+    if (rules && rules.maxLength) {
+      isValid = value.length <= rules.maxLength && isValid
+    }
+    return isValid
   }
 
   render() {
@@ -162,10 +198,15 @@ class ContactData extends Component {
             elementConfig={formElement.config.elementConfig}
             value={formElement.config.value}
             changed={(event) => this.inputChangedHandler(event, formElement.id)}
+            invalid={!formElement.config.valid}
+            shouldValidate={formElement.config.validation}
+            touched={formElement.config.touched}
           />
         ))}
 
-        <Button btnType="Success">ORDER</Button>
+        <Button btnType="Success" disabled={!this.state.formIsValid}>
+          ORDER
+        </Button>
       </form>
     )
     if (this.state.loading) {
