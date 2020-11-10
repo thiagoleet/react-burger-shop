@@ -1,56 +1,12 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { elementType } from 'prop-types'
 import Button from '../../../components/UI/Button/Button'
 import Spinner from '../../../components/UI/Spinner/Spinner'
 import Input from '../../../components/UI/Input/Input'
 import classes from './ContactData.css'
 import service from '../../../services'
-import { elementType } from 'prop-types'
-
-class FormElement {
-  constructor() {
-    this.elementType = 'input'
-    this.value = ''
-    this.elementConfig = {
-      type: 'text',
-      placeholder: undefined,
-      name: undefined,
-      options: [],
-    }
-    this.validation = null
-    this.valid = false
-    this.touched = false
-  }
-}
-
-class FormElementBuilder {
-  constructor() {
-    this.formElement = new FormElement()
-  }
-
-  setElementType(elementType) {
-    this.formElement.elementType = elementType
-    return this
-  }
-
-  addValue(value) {
-    this.formElement.value = value
-    return this
-  }
-
-  addConfig({ type, placeholder, name, options }) {
-    this.formElement.elementConfig = { type, placeholder, name, options }
-    return this
-  }
-
-  addValidation(validation) {
-    this.formElement.validation = validation
-    return this
-  }
-
-  build() {
-    return this.formElement
-  }
-}
+import { FormElement, FormElementBuilder } from '../../../helpers/form'
 
 class ContactData extends Component {
   constructor(props) {
@@ -77,7 +33,6 @@ class ContactData extends Component {
           .build(),
 
         email: new FormElementBuilder()
-          .setElementType('input')
           .addConfig({
             type: 'email',
             name: 'email',
@@ -87,7 +42,6 @@ class ContactData extends Component {
           .build(),
 
         name: new FormElementBuilder()
-          .setElementType('input')
           .addConfig({
             name: 'name',
             type: 'text',
@@ -97,7 +51,6 @@ class ContactData extends Component {
           .build(),
 
         street: new FormElementBuilder()
-          .setElementType('input')
           .addConfig({
             name: 'street',
             type: 'text',
@@ -106,7 +59,6 @@ class ContactData extends Component {
           .addValidation({ required: true })
           .build(),
         zipCode: new FormElementBuilder()
-          .setElementType('input')
           .addConfig({
             name: 'postal',
             type: 'number',
@@ -128,8 +80,8 @@ class ContactData extends Component {
       ].value
     }
     const order = {
-      ingredients: this.props.ingredients,
-      price: this.props.totalPrice,
+      ingredients: this.props.ings,
+      price: this.props.price,
       orderData: formData,
     }
 
@@ -221,4 +173,11 @@ class ContactData extends Component {
   }
 }
 
-export default ContactData
+const mapStateToProps = (state) => {
+  return {
+    ings: state.ingredients,
+    price: state.totalPrice,
+  }
+}
+
+export default connect(mapStateToProps)(ContactData)
