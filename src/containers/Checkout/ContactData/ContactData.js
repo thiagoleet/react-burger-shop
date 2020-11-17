@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { elementType } from 'prop-types'
 import Button from '../../../components/UI/Button/Button'
 import Spinner from '../../../components/UI/Spinner/Spinner'
 import Input from '../../../components/UI/Input/Input'
 import classes from './ContactData.css'
 import service from '../../../services'
-import { FormElement, FormElementBuilder } from '../../../helpers/form'
+import { FormElementBuilder } from '../../../helpers/form'
 
 class ContactData extends Component {
   constructor(props) {

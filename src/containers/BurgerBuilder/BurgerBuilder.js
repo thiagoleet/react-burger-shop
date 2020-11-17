@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import * as actionTypes from '../../store/actions'
+import * as burgerBuilderActions from '../../store/actions'
 import Aux from '../../hoc/aux-hoc'
 import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal'
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
-import service from '../../services'
 import axios from '../../axios-orders'
 import Spinner from '../../components/UI/Spinner/Spinner'
 import withErrorHandler from '../../hoc/withErrorHandler'
@@ -19,15 +18,6 @@ class BurgerBuilder extends Component {
       loading: false,
       error: false,
     }
-  }
-
-  async componentDidMount() {
-    // try {
-    //   const { data } = await service.getIngredients()
-    //   this.setState({ ingredients: data })
-    // } catch (error) {
-    //   this.setState({ error: true })
-    // }
   }
 
   updatePurchaseState = (ingredients) => {
@@ -123,16 +113,11 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = (dispatch) => {
   return {
-    onIngredientAdded: (ingredientName) =>
-      dispatch({
-        type: actionTypes.ADD_INGREDIENT,
-        payload: { ingredientName },
-      }),
+    onIngredientAdded: (ingredientName) => {
+      return dispatch(burgerBuilderActions.addIngredient(ingredientName))
+    },
     onIngredientRemoved: (ingredientName) =>
-      dispatch({
-        type: actionTypes.REMOVE_INGREDIENT,
-        payload: { ingredientName },
-      }),
+      dispatch(burgerBuilderActions.removeIngredient(ingredientName)),
   }
 }
 

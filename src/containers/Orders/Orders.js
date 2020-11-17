@@ -7,7 +7,6 @@ class Orders extends Component {
     super(props)
     this.state = {
       orders: [],
-      loading: true,
     }
   }
   componentDidMount() {
@@ -21,11 +20,6 @@ class Orders extends Component {
         this.setState({ orders: fetchedOrders })
       })
       .catch((err) => {})
-      .finally(() => {
-        this.setState((prevState) => {
-          loading: false
-        })
-      })
   }
 
   render() {
