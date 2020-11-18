@@ -3,11 +3,15 @@ import { connect } from 'react-redux'
 import Button from '../../../components/UI/Button/Button'
 import Spinner from '../../../components/UI/Spinner/Spinner'
 import Input from '../../../components/UI/Input/Input'
-import classes from './ContactData.css'
 import axios from '../../../axios-orders'
-import { FormElementBuilder } from '../../../helpers/form'
+import {
+  FormElementBuilder,
+  setupForm,
+  inputChangedHelper,
+} from '../../../helpers/form'
 import withErrorHandler from '../../../hoc/withErrorHandler'
 import * as actions from '../../../store/actions'
+import classes from './ContactData.css'
 
 class ContactData extends Component {
   constructor(props) {
@@ -89,46 +93,16 @@ class ContactData extends Component {
   }
 
   inputChangedHandler = (event, formElementKey) => {
-    const updatedOrderForm = { ...this.state.orderForm }
-    const updatedFormElement = { ...updatedOrderForm[formElementKey] }
-    updatedFormElement.value = event.target.value
-    updatedFormElement.valid = this.checkValidity(
-      event.target.value,
-      updatedFormElement.validation
+    const { updatedOrderForm, formIsValid } = inputChangedHelper(
+      event,
+      formElementKey,
+      this.state.orderForm
     )
-    updatedFormElement.touched = true
-    updatedOrderForm[formElementKey] = updatedFormElement
-
-    let formIsValid = true
-    for (let inputIdentifier in updatedOrderForm) {
-      formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid
-    }
-
     this.setState({ orderForm: updatedOrderForm, formIsValid: formIsValid })
   }
 
-  checkValidity(value, rules) {
-    let isValid = true
-    if (rules && rules.required) {
-      isValid = value.trim() !== '' && isValid
-    }
-    if (rules && rules.minLength) {
-      isValid = value.length >= rules.minLength && isValid
-    }
-    if (rules && rules.maxLength) {
-      isValid = value.length <= rules.maxLength && isValid
-    }
-    return isValid
-  }
-
   render() {
-    const formElements = []
-    for (let key in this.state.orderForm) {
-      formElements.push({
-        id: key,
-        config: this.state.orderForm[key],
-      })
-    }
+    const formElements = setupForm([], this.state.order)
 
     let form = (
       <form onSubmit={this.orderHandler}>
